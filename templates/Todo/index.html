@@ -1,0 +1,46 @@
+{% extends 'Todo/base.html' %}
+
+{% block content %}
+    <h1>Todo List</h1>
+    <a href="{% url 'Todo:task_add' %}" class="btn btn-primary mb-3">Add Task</a>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Content</th>
+                <th>Created At</th>
+                <th>Deadline</th>
+                <th>Done</th>
+                <th>Tags</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for task in tasks %}
+                <tr>
+                    <td>{{ task.content }}</td>
+                    <td>{{ task.created_at }}</td>
+                    <td>{{ task.deadline|default:"—" }}</td>
+                    <td>{{ task.is_done|yesno:"Yes,No" }}</td>
+                    <td>
+                        {% for tag in task.tags.all %}
+                            {{ tag.name }}{% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            —
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <a href="{% url 'Todo:task_update' task.pk %}" class="btn btn-sm btn-warning">Update</a>
+                        <a href="{% url 'Todo:task_delete' task.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                        <a href="{% url 'Todo:task_toggle' task.pk %}" class="btn btn-sm {% if task.is_done %}btn-secondary{% else %}btn-success{% endif %}">
+                            {% if task.is_done %}Undo{% else %}Complete{% endif %}
+                        </a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6">No tasks yet.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
